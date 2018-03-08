@@ -15,7 +15,7 @@
  * along with Siebe Projects samples.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.siebeprojects.samples.keyboardheight;
+package sk.turn.keyboardheight;
 
 /**
  * The observer that will be notified when the height of 
@@ -23,13 +23,14 @@ package com.siebeprojects.samples.keyboardheight;
  */
 public interface KeyboardHeightObserver {
 
-    /** 
-     * Called when the keyboard height has changed, 0 means keyboard is closed,
-     * >= 1 means keyboard is opened.
-     * 
-     * @param height        The height of the keyboard in pixels
-     * @param orientation   The orientation either: Configuration.ORIENTATION_PORTRAIT or 
-     *                      Configuration.ORIENTATION_LANDSCAPE
-     */
-    void onKeyboardHeightChanged(int height, int orientation);
+	/**
+	 * Called when the keyboard height has changed, 0 means keyboard is closed,
+	 * >= 1 means keyboard is opened.
+	 *
+	 * @param height        The height of the keyboard in pixels
+	 * @param orientation   The orientation either: Configuration.ORIENTATION_PORTRAIT or
+	 *                      Configuration.ORIENTATION_LANDSCAPE
+	 */
+	void onKeyboardHeightChanged(int height, int orientation);
+
 }
