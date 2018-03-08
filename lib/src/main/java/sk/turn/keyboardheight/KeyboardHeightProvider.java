@@ -29,8 +29,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.PopupWindow;
 
-import com.siebeprojects.samples.keyboardheight.R;
-
 /**
  * The keyboard height provider, this class uses a PopupWindow
  * to calculate the window height when the floating keyboard is opened and closed. 
