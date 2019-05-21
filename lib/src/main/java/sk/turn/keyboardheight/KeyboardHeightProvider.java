@@ -36,16 +36,7 @@ import android.widget.PopupWindow;
 public class KeyboardHeightProvider extends PopupWindow {
 
 	/** The tag for logging purposes */
-	private final static String TAG = "sample_KeyboardHeightProvider";
-
-	/** The keyboard height observer */
-	private KeyboardHeightObserver observer;
-
-	/** The cached landscape height of the keyboard */
-	private int keyboardLandscapeHeight;
-
-	/** The cached portrait height of the keyboard */
-	private int keyboardPortraitHeight;
+	private final static String TAG = KeyboardHeightProvider.class.getName();
 
 	/** The view that is used to calculate the keyboard height */
 	private View popupView;
@@ -55,6 +46,15 @@ public class KeyboardHeightProvider extends PopupWindow {
 
 	/** The root activity that uses this KeyboardHeightProvider */
 	private Activity activity;
+
+	/** The cached landscape height of the keyboard */
+	private int keyboardLandscapeHeight, keyboardLandscapeHeightDelta;
+
+	/** The cached portrait height of the keyboard */
+	private int keyboardPortraitHeight, keyboardPortraitHeightDelta;
+
+	/** The keyboard height observer */
+	private KeyboardHeightObserver observer;
 
 	/**
 	 * Construct a new KeyboardHeightProvider
@@ -93,7 +93,6 @@ public class KeyboardHeightProvider extends PopupWindow {
 	 * of the Activity.
 	 */
 	public void start() {
-
 		if (!isShowing() && parentView.getWindowToken() != null) {
 			setBackgroundDrawable(new ColorDrawable(0));
 			showAtLocation(parentView, Gravity.NO_GRAVITY, 0, 0);
@@ -105,7 +104,7 @@ public class KeyboardHeightProvider extends PopupWindow {
 	 * this provider will not be used anymore.
 	 */
 	public void close() {
-		this.observer = null;
+		observer = null;
 		dismiss();
 	}
 
@@ -118,6 +117,27 @@ public class KeyboardHeightProvider extends PopupWindow {
 	 */
 	public void setKeyboardHeightObserver(KeyboardHeightObserver observer) {
 		this.observer = observer;
+	}
+
+	/**
+	 * Get cached keyboard height for current screen orientation.
+	 * If keyboard was not yet shown for current orientation, value is undefined.
+	 *
+	 * @return cached keyboard height
+	 */
+	public int getKeyboardHeight() {
+		return getKeyboardHeight(getScreenOrientation());
+	}
+
+	/**
+	 * Get cached keyboard height for given screen orientation.
+	 * If keyboard was not yet shown for given orientation, value is undefined.
+	 *
+	 * @param orientation one of {@link Configuration#ORIENTATION_PORTRAIT ORIENTATION_PORTRAIT} or {@link Configuration#ORIENTATION_LANDSCAPE ORIENTATION_LANDSCAPE}
+	 * @return cached keyboard height
+	 */
+	public int getKeyboardHeight(int orientation) {
+		return orientation == Configuration.ORIENTATION_PORTRAIT ? keyboardPortraitHeight : keyboardLandscapeHeight;
 	}
 
 	/**
@@ -135,7 +155,6 @@ public class KeyboardHeightProvider extends PopupWindow {
 	 * from the activity window height.
 	 */
 	private void handleOnGlobalLayout() {
-
 		Point screenSize = new Point();
 		activity.getWindowManager().getDefaultDisplay().getSize(screenSize);
 
@@ -148,22 +167,28 @@ public class KeyboardHeightProvider extends PopupWindow {
 		int orientation = getScreenOrientation();
 		int keyboardHeight = screenSize.y - rect.bottom;
 
-		if (keyboardHeight == 0) {
+		// fix for phones that give "getWindowVisibleDisplayFrame()" in real screen size
+		// but screenSize is smaller because of e.g. carved out display portion (Xiaomi redmi 9)
+		if (keyboardHeight <= 0) {
+			if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+				keyboardPortraitHeightDelta = keyboardHeight;
+			} else {
+				keyboardLandscapeHeightDelta = keyboardHeight;
+			}
 			notifyKeyboardHeightChanged(0, orientation);
+			return;
 		}
-		else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			this.keyboardPortraitHeight = keyboardHeight;
-			notifyKeyboardHeightChanged(keyboardPortraitHeight, orientation);
+
+		if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+			keyboardHeight -= keyboardPortraitHeightDelta;
+			keyboardPortraitHeight = keyboardHeight;
+		} else {
+			keyboardHeight -= keyboardLandscapeHeightDelta;
+			keyboardLandscapeHeight = keyboardHeight;
 		}
-		else {
-			this.keyboardLandscapeHeight = keyboardHeight;
-			notifyKeyboardHeightChanged(keyboardLandscapeHeight, orientation);
-		}
+		notifyKeyboardHeightChanged(keyboardHeight, orientation);
 	}
 
-	/**
-	 *
-	 */
 	private void notifyKeyboardHeightChanged(int height, int orientation) {
 		if (observer != null) {
 			observer.onKeyboardHeightChanged(height, orientation);
