@@ -1,8 +1,8 @@
 # Release notes
 
-## Release notes version 1.0.2
+## Release notes version 1.0.3
 
-Fix incorrect keyboard height for some phones (e.g. with cardved display)
+Fix incorrect keyboard height for some phones (e.g. with carved display)
 
 ## Release notes version 1.0.1
 
