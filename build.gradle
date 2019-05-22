@@ -13,11 +13,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-    }
-
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        }
+        jcenter()
+        mavenCentral()
     }
 }
