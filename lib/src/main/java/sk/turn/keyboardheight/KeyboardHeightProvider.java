@@ -22,6 +22,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -127,6 +128,18 @@ public class KeyboardHeightProvider extends PopupWindow {
 	 */
 	public int getKeyboardHeight() {
 		return getKeyboardHeight(getScreenOrientation());
+	}
+
+	public Bundle onSaveInstanceState() {
+		Bundle state = new Bundle();
+		state.putInt("keyboardPortraitHeightDelta", keyboardPortraitHeightDelta);
+		state.putInt("keyboardLandscapeHeightDelta", keyboardLandscapeHeightDelta);
+		return state;
+	}
+
+	public void onRestoreInstanceState(Bundle state) {
+		keyboardPortraitHeightDelta = state.getInt("keyboardPortraitHeightDelta");
+		keyboardLandscapeHeightDelta = state.getInt("keyboardLandscapeHeightDelta");
 	}
 
 	/**
